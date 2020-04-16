@@ -1,0 +1,14 @@
+{
+  "name": "@johnburnmurdoch/bar-chart-race-the-most-populous-cities-in-the-world",
+  "main": "a061f2083b7310ef@1205.js",
+  "version": "1205.0.0",
+  "homepage": "https://observablehq.com/@johnburnmurdoch/bar-chart-race-the-most-populous-cities-in-the-world",
+  "author": {
+    "name": "johnburnmurdoch",
+    "url": "https://observablehq.com/@johnburnmurdoch"
+  },
+  "type": "module",
+  "peerDependencies": {
+    "@observablehq/runtime": "4"
+  }
+}
