@@ -133,4 +133,7 @@ dmypy.json
 
 # Data
 yejin.jpg
+.idea/
+*.xls
+*.xlsx
 
