@@ -6,24 +6,25 @@ import os
 import os.path
 import time
 from datetime import datetime
-from datetime import timedelta
+
+TS_TOKEN = "ba73b3943bdd57c2ff05991f7556ef417f457ac453355972ff5d01ce"
 
 
 # 格式化标的代码
 def get_format_code(code, format_class):
-    '''
-    format_class  要求的format类型：
+    """
+    format_class  要求的 format 类型：
     wind  000001.SZ
     sina  sz000001
     num   000001
-    tushare 同wind
-    '''
+    tushare 同 wind
+    """
     code = str(code)
     if len(code) < 6:
         code = '0' * (6 - len(code)) + code
     elif len(code) > 9:
         return code
-    re_num = re.compile('\d{6}')
+    re_num = re.compile("\d{6}")
     sh_list = ['60', '68', '11', '13']
     sz_list = ['30', '00', '12']
     try:
@@ -39,7 +40,7 @@ def get_format_code(code, format_class):
             result = 'sz' + result
         else:
             result = result
-    elif format_class == 'wind' or format_class=='tushare':
+    elif format_class == 'wind' or format_class == 'tushare':
         if result[:2] in sh_list:
             result = result + r'.SH'
         elif result[:2] in sz_list:

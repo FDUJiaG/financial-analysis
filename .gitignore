@@ -136,4 +136,5 @@ yejin.jpg
 .idea/
 *.xls
 *.xlsx
-
+*.ipynb
+nAlert/
