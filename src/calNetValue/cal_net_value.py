@@ -105,7 +105,6 @@ def df_to_flourish(df):
     # print(df_col)
     top_row_dict = dict()
     top_row_dict[flourish_col[0]] = flourish_col[1:]
-    print(top_row_dict)
     for col_item, figs_item in zip(df_col[1:], list(figs_dict.values())):
         top_row_dict[col_item] = [col_item, figs_item]
     top_row = pd.DataFrame(top_row_dict)
