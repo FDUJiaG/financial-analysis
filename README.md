@@ -1,10 +1,11 @@
 # Python for Financial Analysis and Risk Management
 
-最近正在阅读《基于 Python 的金融分析与风险管理》一书，想着边学习边记录，争取推一个 Gitbook
+最近正在阅读《基于 Python 的金融分析与风险管理》一书，想着边学习边记录，并且学习了一些半导体相关的有趣内容，争取推一个 Gitbook
 
 ## Main Content Outline
 
-- [x] Python 环境配置和基本操作
+- [x] Python 的简介和环境配置
+- [x] Python 的基本操作
 - [ ] Numpy，Pandas，Matplotlib，Scipy，StatsModels，arch & Datatime 模块介绍
 - [ ] 利率，债券定价，债券久期与凸性分析
 - [ ] 投资组合理论，资本资产定价模型，股票价格服从的随机过程以及投资组合绩效评估
