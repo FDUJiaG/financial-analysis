@@ -47,7 +47,19 @@ $$
 此外，在 Python 中，可以生成投资组合中每只股票的随机权重
 
 ```python
+import numpy as np
 
+x = np.random.random(5)         # 从均匀分布中随机抽取5个从0到1的随机数
+weights = x/np.sum(x)           # 生成一个权重数组
+print(weights)
+print(round(sum(weights), 2))   # 验证生成的权重随机数是否合计等于1
+```
+
+输出
+
+```console
+[0.10220201 0.27353176 0.1263887  0.32700943 0.1708681 ]
+1.0
 ```
 
 ### Portfolio Volatility (Risk)
@@ -168,3 +180,91 @@ $$
 年波动率 &= \sqrt{252} \times 日波动率 \\
 \end{aligned}
 $$
+
+### Cases
+
+下面通过基于A股市场的一个案例演示如何计算一个投资组合的收益率和波动率
+
+【eg 8-1】假定投资组合配置了5只A股股票，数据是2019年至2021年期间的每个交易日收盘价格
+
+|股票代码|600009|600036|600519|000002|002594|
+|:---:|:---:|:---:|:---:|:---:|:---:|
+|证券简称|上海机场|招商银行|贵州茅台|万科A|比亚迪|
+
+#### Step 1
+
+导入股票的收盘价格数据并且进行可视化
+
+使用 Tushare [通用行情接口](https://tushare.pro/document/2?doc_id=109) 请求数据
+
+```python
+import tushare as ts
+import pandas as pd
+
+TOKEN="SET_YOUR_TOKEN"
+ts.set_token(TOKEN)
+
+# 设置股票列表
+code_dict = {
+    "600009.SH": "上海机场",
+    "600036.SH": "招商银行",
+    "600519.SH": "贵州茅台",
+    "000002.SZ": "万科A",
+    "002594.SZ": "比亚迪"
+}
+code_str = ",".join(code_dict.keys())
+
+data = pd.DataFrame(columns=["trade_date"])
+col_list = ["日期"]
+start_date = "20190101"
+end_date = "20201231"
+
+for code_item in code_dict.keys():
+    df_item = ts.pro_bar(
+        ts_code=code_item,  # 股票标准代码
+        asset="E",          # 资产类别：E股票
+        adj="qfq",          # 复权类型
+        start_date=start_date,
+        end_date=end_date
+    )
+    # 根据日期合并每只标的的收盘信息
+    data = pd.merge(data, df_item[["trade_date", "close"]], how="outer", on="trade_date")
+    col_list.append(code_dict[code_item])
+
+data.columns = col_list     # 重置列名 
+data.sort_values(by=col_list[0], inplace=True)  # 按照日期升序排列
+data.fillna(method='ffill', inplace=True)       # 根据前值替换NaN值
+data.set_index(col_list[0], inplace=True, drop=True)    # 重新设置索引
+
+print(data.head())  # 查看前5行数据
+```
+
+输出
+
+```console
+             上海机场     招商银行      贵州茅台      万科A      比亚迪
+日期
+20190102  49.4780  23.2058  583.4473  22.1556  48.9292
+20190103  48.8102  23.4986  574.7002  22.3132  47.8246
+20190104  48.9280  24.0936  586.3890  23.1104  50.4020
+20190107  48.8888  24.1031  589.7885  23.2216  51.1383
+20190108  48.9477  23.8197  589.1066  23.1753  52.6210
+```
+
+将股价按首个交易日进行归一化处理
+
+```python
+import matplotlib.pyplot as plt
+plt.rcParams['font.sans-serif'] = ['SimHei']    # 用来正常显示中文标签
+plt.rcParams['axes.unicode_minus'] = False      # 用来正常显示负号
+(data/data.iloc[0]).plot(figsize=(8, 6))
+plt.show()
+```
+
+得到股价从2019年至2020年的走势图（股价在2019年首个交易日归一化处理）
+
+![Stock Price Chart](./figs/stock-price-chart.png)
+
+不难看出，走势还是存在一定的分化
+
+#### Step 2
