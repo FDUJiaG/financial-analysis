@@ -406,7 +406,7 @@ print("投资组合的收益波动率：{:.2%}".format(vol_port))
 
 在投资组合理论中，所有可能的投资组合被称为可行集，有效前沿（efficient frontier）是可行集的一条包络线，它表示了在不同风险条件下能够给投资者带来的最高预期收益率，或者在不同预期收益率条件下能够给投资者带来的最低波动率（风险）
 
-### Mapping viable sets
+### Mapping Viable Sets
 
 Python 可以非常方便地生成投资组合的权重随机数，然后再根据权重数生成相对应的投资组合预期收益率与波动率，并且进行可视化
 
@@ -442,3 +442,146 @@ plt.show()
 ![Portfolio Return Versus Volatility](./figs/portfolio-return-versus-volatility.png)
 
 图中的散点就构成了一个可行集，在可行集内部，在波动率一定的情况下，理性的投资者一定会选择可行集最上方的点进行投资，因为可以实现预期收益率的最大化；同样，在预期收益率一定的情况下，理性投资者一定会选择可行集最左侧的点进行投资，因为可以实现收益波动率的最小化，也就是风险的最小化
+
+### Building Effective Frontiers
+
+其实，有效前沿就是求解以下这个最优方程式
+
+$$
+\min\limits_{w_i} \sigma_P
+= \min\limits_{w_i} \sqrt{\sum\limits_{i=1}^N \sum\limits_{j=1}^N
+w_i w_j Cov(R_i, R_j)} \tag{5-10}
+$$
+
+约束条件分别是
+
+$$
+\sum\limits_{i=1}^N w_i=1 \\
+w_i>0 \\
+E(R_p) = E(\sum\limits_{i=1}^N w_i R_i) = Const
+$$
+
+注意，其中第二条作为约束条件之一就表明不考虑股票卖空的情况（不考虑融券的情况）
+
+在构建有效前沿的过程中，需要运用 SciPy 子模块 optimize 中的 minimize 函数
+
+【eg 5-3】沿用前例信息，同事给定投资组合的预期收益率等于 50%，运用 Python 计算使得投资组合收益波动率最小情况下的每只股票的配置权重
+
+```python
+import scipy.optimize as sco
+
+def f(w):
+    # 定义一个需要求解最优化的函数
+    w = np.array(w)              # 设置投资组合中每只股票的权重
+    Rp_opt = np.sum(w * R_mean)  # 计算最优化投资组合的预期收益率
+    Vp_opt = np.sqrt(np.dot(w, np.dot(R_cov, w.T)))     # 计算优化投资组合的收益波动率
+    return np.array([Rp_opt, Vp_opt])                              # 以数组的格式输出
+
+def Vmin_f(w):
+    # 定义一个得到最小波动率的权重函数
+    # 输出前面定义的函数f(w)结果的第二个元素
+    return f(w)[1]
+
+p_pct = 0.5      # 预期收益率等于50%
+# 以字典格式依次输入权重的约束条件
+cons = (
+    {
+        'type': 'eq',
+        'fun': lambda x: np.sum(x) - 1
+    },
+    {
+        'type': 'eq',
+        'fun': lambda x: f(x)[0] - p_pct
+    }
+)
+# 以元组格式输入权重的边界条件
+bnds = tuple((0, 1) for x in range(len(R_mean)))
+
+weights0 = len(R_mean) * [1.0 / len(R_mean), ]  # 用于生成一个权重相等的数组
+result = sco.minimize(Vmin_f, weights0, method="SLSQP", bounds=bnds, constraints=cons)
+
+for stock_item, idx in zip(R_mean.index, range(len(R_mean))):
+    print("投资组合预期收益率{:.0%}时{}的权重: {:.4f}".format(p_pct, stock_item, result['x'][idx]))
+```
+
+输出
+
+```console
+投资组合预期收益率50%时上海机场的权重: 0.0420
+投资组合预期收益率50%时招商银行的权重: 0.3208
+投资组合预期收益率50%时贵州茅台的权重: 0.4369
+投资组合预期收益率50%时万科A的权重: 0.0647
+投资组合预期收益率50%时比亚迪的权重: 0.1356
+```
+
+通过计算得到，在投资组合的预期收益率 50% 时，实现投资组合收益波动率最小的股票权重分别是配置上海机场 4.2%，招商银行 32.08%，贵州茅台 43.69%，万科A 6.47% 以及比亚迪 13.56%
+
+进一步而言，有效前沿的起点是在可行集中的投资组合收益波动率全局最小值和与之对应的投资组合预期收益率
+
+【eg 5-4】计算该投资组合收益波动率的全局最小值，以及与该最小波动率相对应的预期收益率
+
+```python
+# 仅设置权重和等于1的约束条件
+cons = (
+    {
+        'type': 'eq',
+        'fun': lambda x: np.sum(x) - 1
+    }
+)
+
+result_vmin = sco.minimize(Vmin_f, weights0, method="SLSQP", bounds=bnds, constraints=cons)
+Rp_vmin = np.sum(R_mean * result_vmin['x'])
+Vp_vmin = result_vmin['fun']
+
+print("波动率在可行集是全局最小值时的投资组合预期收益率: {:.4f}".format(Rp_vmin))
+print("在可行集是全局最小的波动率: {:.4f}".format(Vp_vmin))
+```
+
+输出
+
+```console
+波动率在可行集是全局最小值时的投资组合预期收益率: 0.3821
+在可行集是全局最小的波动率: 0.2257
+```
+
+最后，给定投资组合的预期收益率是一个数组，就可以得到在投资组合收益波动率最小情况下，投资组合的每只股票配置权重以及对应的投资组合收益波动率，这些预期收益率和收益波动率的集合就构成了有效前沿
+
+【eg 5-5】最终完成对有效前沿的创建并可视化
+
+```python
+Rp_target = np.linspace(Rp_vmin, max(Rp_list) + 0.1, 100)   # 生成投资组合的目标收益率数组
+Vp_target = list()
+for r in Rp_target:
+    # 以字典格式依次输入预期收益率等于目标收益率的约束条件和权重的约束条件
+    cons_new = (
+        {
+            'type': 'eq',
+            'fun': lambda x: np.sum(x) - 1
+        },
+        {
+            'type': 'eq',
+            'fun': lambda x: f(x)[0] - r
+        }
+    )
+    result_new = sco.minimize(Vmin_f, weights0, method="SLSQP", bounds=bnds, constraints=cons_new)
+    Vp_target.append(result_new['fun'])
+
+plt.figure(figsize=(8, 6))
+plt.scatter(Vp_list, Rp_list)
+plt.plot(Vp_target, Rp_target, 'r-', label=u'有效前沿', lw=2.5)
+plt.plot(Vp_vmin, Rp_vmin, 'y*', label=u'全局最小波动率', markersize=14)
+plt.xlabel(u'波动率', fontsize=13)
+plt.ylabel(u'收益率', fontsize=13, rotation=0)
+plt.xticks(fontsize=13)
+plt.yticks(fontsize=13)
+plt.xlim(max(0, round(min(Vp_list) -0.05, 1)), round(max(Vp_list) + 0.05, 1))
+plt.ylim(round(min(Rp_list) - 0.05, 1), round(max(Rp_list) + 0.05, 1))
+plt.title(u'投资组合的有效前沿', fontsize=13)
+plt.legend(fontsize=13)
+plt.grid('True')
+plt.show()
+```
+
+![Effective Frontier of the Portfolio](./figs/effective-frontier-of-the-portfolio.png)
+
+可以看到，投资组合的有效前沿就是可行集的一条包络线，并且起点就是在可行集中投资组合收益波动率的全局最小值和与之对应的投资组合预期收益率所构成的点
