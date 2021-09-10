@@ -107,7 +107,7 @@ In [13]: type(b)
 Out[13]: str
 ```
 
-注意，Machine 与 Learning 之间的空格也占据一个字符
+注意，Quantitative 与 Trading 之间的空格也占据一个字符
 
 ```console
 In [14]: c = '量化交易'
@@ -406,12 +406,12 @@ Out[71]: 3
 #### Set Creation
 
 ```console
-In [72]: set1 = {'SSS', 'LJ', 'HXH', 'QYW', 'ZSY'}
+In [72]: set1 = {'SSS', 'LJ', 'HXH', 'ZJR', 'ZSY'}
 
 In [73]: type(set1)
 Out[73]: set
 
-In [74]: set2 = {'DYX', 'WRQ', 'QJ', 'SSS', 'HXH'}
+In [74]: set2 = {'DYX', 'SSS', 'QJ', 'TY', 'HXH'}
 
 In [75]: type(set2)
 Out[75]: set
@@ -423,7 +423,7 @@ Out[75]: set
 
 ```console
 In [76]: set1 | set2
-Out[76]: {'DYX', 'HXH', 'LJ', 'QJ', 'QYW', 'SSS', 'WRQ', 'ZSY'}
+Out[76]: {'DYX', 'HXH', 'LJ', 'QJ', 'SSS', 'TY', 'ZJR', 'ZSY'}
 ```
 
 #### Set Operation - Intersection
@@ -444,10 +444,10 @@ Out[78]: {'HXH', 'SSS'}
 
 ```console
 In [79]: set1 - set2        # set1 对 set2 的差集
-Out[79]: {'LJ', 'QYW', 'ZSY'}
+Out[79]: {'LJ', 'ZJR', 'ZSY'}
 
 In [80]: set2 - set1        # set2 对 set1 的差集
-Out[80]: {'DYX', 'QJ', 'WRQ'}
+Out[80]: {'DYX', 'QJ', 'TY'}
 ```
 
 #### Modification of Set
@@ -455,7 +455,7 @@ Out[80]: {'DYX', 'QJ', 'WRQ'}
 可以在已经创建的集合中添加新的元素，需要运用 `add` 函数，并且输出的结果可能会自行排列
 
 ```console
-In [81]: set1.add('ZJR')
+In [81]: set1.add('QYW')
 
 In [82]: set1
 Out[82]: {'HXH', 'LJ', 'QYW', 'SSS', 'ZJR', 'ZSY'}
