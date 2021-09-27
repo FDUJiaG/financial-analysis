@@ -502,10 +502,6 @@ Out[87]: dict
 
 In [88]: dict2 = {}     # 间接法创建
 
-dict2['成员名称'] = 'SXR'
-dict2['队伍名称'] = 'Team X'
-dict2['所属公司'] = 'SNH48 Group'
-
 In [89]: dict2['成员名称'] = 'SXR'
     ...: dict2['队伍名称'] = 'Team X'
     ...: dict2['所属公司'] = 'SNH48 Group'
