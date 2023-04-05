@@ -1,4 +1,5 @@
 import time
+import numpy as np
 import pandas as pd
 import tushare as ts
 from src.calNetValue.utils import print_info, get_api, tushare_token, player_dict, stock_dict, figs_dict, index_dict
@@ -134,12 +135,21 @@ def six_code_to_ts_code(code):
         return False
 
 
+def get_daily_best(df):
+    new_df = df.set_index(df.columns[0], drop=True)
+    rate_df = new_df/new_df.shift(1)
+    print(rate_df.values[-1])
+    return rate_df.columns[np.argmax(rate_df.values[-1])]
+
+
 if __name__ == '__main__':
     pro = get_api(tushare_token)
     START_DATE = "20210531"
     TODAY = time.strftime("%Y%m%d", time.localtime())
     END_DATE = TODAY
     all_df = all_net_value(player_dict, START_DATE, END_DATE)
+    print(print_info(), end=" ")
+    print("{} Best Product: {}".format(TODAY, get_daily_best(all_df)))
     df_flourish = df_to_flourish(all_df)
     df_flourish.to_excel("flourish_data.xlsx", header=None)
 

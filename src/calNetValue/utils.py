@@ -2,7 +2,8 @@ from datetime import datetime
 import tushare as ts
 
 player_dict = {
-    "ty": "争七保八",
+    # "ty": "争七保八",
+    "ty": "小机灵鬼",
     "lxx": "superX",
     "hyj": "和光同尘",
     "hh": "守旧待时",
