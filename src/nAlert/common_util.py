@@ -60,21 +60,21 @@ def get_asset_class(code):
         return '结算备付金'
     elif code.startswith('1031') and len(code) == 4:
         return '存出保证金'
-    elif code.startswith('1102') and len(code) == 14 and (not code[6:8]=='99'):
+    elif code.startswith('1102') and len(code) == 14 and (not code[6:8] == '99'):
         return '股票投资'
-    elif code.startswith('1103') and len(code) == 14 and (not code[6:8]=='99'):
+    elif code.startswith('1103') and len(code) == 14 and (not code[6:8] == '99'):
         return '债券投资'
-    elif code.startswith('1105') and len(code) == 14 and (not code[6:8]=='99'):
+    elif code.startswith('1105') and len(code) == 14 and (not code[6:8] == '99'):
         return '基金投资'
-    elif code.startswith('1109') and len(code) == 14 and (not code[6:8]=='99'):
+    elif code.startswith('1109') and len(code) == 14 and (not code[6:8] == '99'):
         return '其他投资'
     elif code.startswith('1204') and len(code) == 4:
         return '应收利息'
     elif code.startswith('22') and len(code) == 4:
         return '负债'
-    elif code== '实收资本':
+    elif code == '实收资本':
         return '实收资本'
-    elif code.startswith('2') and len(code)==4:
+    elif code.startswith('2') and len(code) == 4:
         return '其他负债'
     elif code.startswith('1') and len(code) == 4:
         return '其他资产'
@@ -90,7 +90,7 @@ def gen_month_series(start_date, end_date):
     end_date_list = []
     for date in date_series:
         date = date.strftime('%Y%m%d')
-        if date[-2:]=='01':
+        if date[-2:] == '01':
             start_date_list.append(date)
             month_range = calendar.monthrange(int(date[:4]), int(date[4:6]))
             end_date_list.append(date[:6] + str(month_range[1]))
@@ -102,13 +102,13 @@ def clear_sp_path(target_path):
     walker = os.walk(target_path)
     for each in walker:
         for file in each[2]:
-            chg_time = parse(time.ctime(os.path.getctime(each[0]+file)))
-            if chg_time < parse(datetime.now().strftime('%Y%m%d')+' 00:00:00'):
-                os.remove(each[0]+file)
+            chg_time = parse(time.ctime(os.path.getctime(each[0] + file)))
+            if chg_time < parse(datetime.now().strftime('%Y%m%d') + ' 00:00:00'):
+                os.remove(each[0] + file)
 
 
 if __name__ == '__main__':
     # a = get_format_code('002983.SZ','wind')
     # print(a)
     # gen_month_series('20200506','20201004')
-    clear_sp_path(r'C:\Users\1\Desktop\ff'+'\\')
+    clear_sp_path(r'C:\Users\1\Desktop\ff' + '\\')

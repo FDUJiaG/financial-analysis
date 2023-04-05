@@ -131,13 +131,21 @@ dmypy.json
 # Mac
 .DS_Store
 
+
+
 # Data
 yejin.jpg
 .idea/
 *.csv
 *.xls
 *.xlsx
-*.ipynb
+*.PDF
+*.doc
+*.docx
+# *.ipynb
 nAlert/
 bak/
 data/
+snh48/
+PDF/
+ns_emerg.py
